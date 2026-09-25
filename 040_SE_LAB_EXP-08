@@ -1,0 +1,118 @@
+1. HospitalManagerUITest.java
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.time.Duration;
+
+public class HospitalManagerUITest {
+
+    static WebDriver driver;
+
+    @BeforeAll
+    public static void setup() {
+        // Selenium 4.46 automatically manages the correct ChromeDriver
+        driver = new ChromeDriver();
+
+        driver.manage().window().maximize();
+    }
+
+    @Test
+    public void testAddPatient() {
+
+        driver.get("file:///home/student/Desktop/Ram%20CSE/exp8.html");
+
+        WebDriverWait wait =
+                new WebDriverWait(driver, Duration.ofSeconds(5));
+
+        // Wait for the form elements to be available
+        WebElement nameField =
+                wait.until(ExpectedConditions.visibilityOfElementLocated(
+                        By.id("name")));
+
+        WebElement ageField =
+                wait.until(ExpectedConditions.visibilityOfElementLocated(
+                        By.id("age")));
+
+        WebElement diseaseField =
+                wait.until(ExpectedConditions.visibilityOfElementLocated(
+                        By.id("disease")));
+
+        WebElement submitButton =
+                wait.until(ExpectedConditions.elementToBeClickable(
+                        By.id("submit")));
+
+        // Enter patient details
+        nameField.sendKeys("John");
+        ageField.sendKeys("30");
+        diseaseField.sendKeys("Flu");
+
+        // Submit
+        submitButton.click();
+
+        // Check patient count
+        WebElement patientCount =
+                wait.until(ExpectedConditions.visibilityOfElementLocated(
+                        By.id("patientcount")));
+
+        assertTrue(
+                patientCount.getText().contains("1"),
+                "Patient was not added successfully"
+        );
+
+        System.out.println("Patient added successfully");
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+}
+
+2. exp8.html
+<html>
+<head>
+<title>Hospital Management System</title>
+<script>
+    var patientCount = 0;
+    function addPatient() {
+        var name = document.getElementById("name").value;
+        var age = document.getElementById("age").value;
+        var disease = document.getElementById("disease").value;
+        if (name == "" || age == "" || disease == "") {
+            alert("Please fill all fields");
+            return false;
+        }
+        patientCount++;
+        document.getElementById("patientCount").innerHTML =
+            "Patient Count : " + patientCount;
+        return false;
+    }
+</script>
+</head>
+<body>
+<h2>Hospital Management System</h2>
+<form onsubmit="return addPatient();">
+    <label>Name</label><br>
+    <input type="text" id="name"><br><br>
+    <label>Age</label><br>
+    <input type="number" id="age"><br><br>
+    <label>Disease</label><br>
+    <input type="text" id="disease"><br><br>
+    <input type="submit" id="submit" value="Submit">
+</form>
+<h3 id="patientCount">Patient Count : 0</h3>
+</body>
+</html>
